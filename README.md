@@ -7,7 +7,7 @@ A production-grade [Model Context Protocol (MCP)](https://modelcontextprotocol.i
 
 ## Overview
 
-This server exposes 15 named MCP tools across four categories: **collections**, **direct debit**, **verification**, and **utilities**. It is designed for use by AI agents (Claude, GPT, etc.) in regulated fintech environments where type safety, security, and idempotency are non-negotiable.
+This server exposes 22 named MCP tools across four categories: **collections**, **direct debit**, **verification**, and **utilities**. It is designed for use by AI agents (Claude, GPT, etc.) in regulated fintech environments where type safety, security, and idempotency are non-negotiable.
 
 Key properties:
 
@@ -154,17 +154,24 @@ npm run typecheck  # Verify no type errors introduced
 
 The `generate` script runs `openapi-typescript` and `openapi-zod-client` in sequence.
 
-## Available Tools (15)
+## Available Tools (22)
 
 ### Collections
 
-| Tool                             | Description                                               |
-| -------------------------------- | --------------------------------------------------------- |
-| `monnify_initiate_payment`       | Initiates a payment and returns a checkout URL            |
-| `monnify_reserve_account`        | Reserves a virtual bank account for persistent collection |
-| `monnify_get_transaction_status` | Queries transaction status by reference                   |
-| `monnify_create_invoice`         | Creates a payment invoice with expiry date                |
-| `monnify_process_refund`         | Initiates a full or partial refund                        |
+| Tool                              | Description                                               |
+| --------------------------------- | --------------------------------------------------------- |
+| `monnify_initiate_payment`        | Initiates a payment and returns a checkout URL            |
+| `monnify_reserve_account`         | Reserves a virtual bank account for persistent collection |
+| `monnify_get_transaction_status`  | Queries transaction status by reference                   |
+| `monnify_get_transaction_details` | Fetches full details of a transaction                     |
+| `monnify_get_all_transactions`    | Lists transactions with pagination and filters            |
+| `monnify_create_invoice`          | Creates a payment invoice with expiry date                |
+| `monnify_process_refund`          | Initiates a full or partial refund                        |
+| `monnify_pay_with_bank_transfer`  | Initiates a pay-by-bank-transfer flow                     |
+| `monnify_charge_card`             | Charges a card directly with PAN and CVV                  |
+| `monnify_charge_card_token`       | Charges a previously tokenised card                       |
+| `monnify_authorise_card_otp`      | Submits OTP to complete a card charge                     |
+| `monnify_authorise_card_3ds`      | Completes 3DS authorisation for a card charge             |
 
 ### Direct Debit (Mandate Lifecycle)
 
@@ -187,10 +194,9 @@ The `generate` script runs `openapi-typescript` and `openapi-zod-client` in sequ
 
 ### Utilities
 
-| Tool                           | Description                          |
-| ------------------------------ | ------------------------------------ |
-| `monnify_get_supported_banks`  | Lists all supported banks with codes |
-| `monnify_get_transaction_list` | Searches transactions with filters   |
+| Tool                          | Description                          |
+| ----------------------------- | ------------------------------------ |
+| `monnify_get_supported_banks` | Lists all supported banks with codes |
 
 ## Required Monnify Permissions
 

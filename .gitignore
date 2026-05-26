@@ -37,6 +37,9 @@ bower_components
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
+# TypeScript build output (included in npm package via files field, not tracked in git)
+build/
+
 # Dependency directories
 node_modules/
 jspm_packages/

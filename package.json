@@ -1,11 +1,11 @@
 {
-  "name": "@monnify/mcp",
+  "name": "@monnify/mcp-server",
   "version": "1.0.0",
   "description": "Production-grade MCP server for Monnify payment APIs — TypeScript, OpenAPI-driven",
   "type": "module",
   "main": "build/index.js",
   "bin": {
-    "monnify-mcp": "./build/cli.js"
+    "mcp-server": "./build/cli.js"
   },
   "files": [
     "build/",

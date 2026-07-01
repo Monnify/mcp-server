@@ -8,6 +8,9 @@ import { registerTool } from "../registry.js";
 import { MonnifyApiError } from "../../utils/errors.js";
 import { errorResult } from "../../types/mcp.js";
 import { InitiatePaymentInputSchema } from "../../schemas/extended/collections.js";
+import { env } from "../../config/env.js";
+import { formatInitiatePayment } from "../../utils/format.js";
+import { getResponseFormat } from "../../utils/clientContext.js";
 
 const definition: Tool = {
   name: "monnify_initiate_payment",
@@ -28,13 +31,14 @@ KEY OUTPUT FIELDS: transactionReference (Monnify's ref), paymentReference (your 
 async function handler(args: unknown): Promise<McpToolResult> {
   try {
     const parsed = InitiatePaymentInputSchema.parse(args);
+    const contractCode = parsed.contractCode ?? env().MONNIFY_CONTRACT_CODE;
     const result = await apiPost<Record<string, unknown>>(
       "/api/v1/merchant/transactions/init-transaction",
-      parsed
+      { ...parsed, contractCode }
     );
     const sanitised = sanitiseInitiatePaymentResponse(result);
     return {
-      content: [{ type: "text", text: JSON.stringify(sanitised, null, 2) }],
+      content: [{ type: "text", text: getResponseFormat() === "json" ? JSON.stringify(sanitised, null, 2) : formatInitiatePayment(sanitised as Record<string, unknown>) }],
     };
   } catch (error) {
     if (error instanceof z.ZodError) {

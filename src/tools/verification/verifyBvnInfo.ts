@@ -8,6 +8,8 @@ import { registerTool } from "../registry.js";
 import { MonnifyApiError } from "../../utils/errors.js";
 import { errorResult } from "../../types/mcp.js";
 import { VerifyBvnInfoInputSchema } from "../../schemas/extended/verification.js";
+import { formatBvnInfo } from "../../utils/format.js";
+import { getResponseFormat } from "../../utils/clientContext.js";
 
 const definition: Tool = {
   name: "monnify_verify_bvn_info",
@@ -34,7 +36,7 @@ async function handler(args: unknown): Promise<McpToolResult> {
     );
     const sanitised = sanitiseBvnInfoResponse(result);
     return {
-      content: [{ type: "text", text: JSON.stringify(sanitised, null, 2) }],
+      content: [{ type: "text", text: getResponseFormat() === "json" ? JSON.stringify(sanitised, null, 2) : formatBvnInfo(sanitised as Record<string, unknown>) }],
     };
   } catch (error) {
     if (error instanceof z.ZodError) {

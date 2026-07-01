@@ -179,6 +179,40 @@ const NIN_FIELDS = [
   "ninInformationMatch",
 ] as const;
 
+// Reserved account management — whitelisted fields
+const RESERVED_ACCOUNT_DETAILS_FIELDS = [
+  "contractCode",
+  "accountReference",
+  "accountName",
+  "currencyCode",
+  "customerEmail",
+  "customerName",
+  "accounts",
+  "collectionChannel",
+  "reservationReference",
+  "reservedAccountType",
+  "status",
+  "createdOn",
+  "restrictPaymentSource",
+] as const;
+
+const RESERVED_ACCOUNT_TRANSACTION_FIELDS = [
+  "transactionReference",
+  "paymentReference",
+  "amountPaid",
+  "totalPayable",
+  "paymentStatus",
+  "paidOn",
+  "paymentMethod",
+  "currencyCode",
+] as const;
+
+const DEALLOCATE_ACCOUNT_FIELDS = [
+  "accountReference",
+  "accountName",
+  "status",
+] as const;
+
 // Bank list — whitelisted fields
 const BANK_FIELDS = ["name", "code"] as const;
 
@@ -307,4 +341,22 @@ export function sanitiseBankListResponse(
   raw: Array<Record<string, unknown>>
 ): Array<Record<(typeof BANK_FIELDS)[number], unknown>> {
   return raw.map((bank) => pickFields(bank, BANK_FIELDS));
+}
+
+export function sanitiseReservedAccountDetailsResponse(
+  raw: Record<string, unknown>
+): Record<(typeof RESERVED_ACCOUNT_DETAILS_FIELDS)[number], unknown> {
+  return pickFields(raw, RESERVED_ACCOUNT_DETAILS_FIELDS);
+}
+
+export function sanitiseReservedAccountTransactionsResponse(
+  raw: Array<Record<string, unknown>>
+): Array<Record<(typeof RESERVED_ACCOUNT_TRANSACTION_FIELDS)[number], unknown>> {
+  return raw.map((tx) => pickFields(tx, RESERVED_ACCOUNT_TRANSACTION_FIELDS));
+}
+
+export function sanitiseDeallocateAccountResponse(
+  raw: Record<string, unknown>
+): Record<(typeof DEALLOCATE_ACCOUNT_FIELDS)[number], unknown> {
+  return pickFields(raw, DEALLOCATE_ACCOUNT_FIELDS);
 }

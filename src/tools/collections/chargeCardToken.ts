@@ -7,7 +7,10 @@ import { sanitiseChargeCardTokenResponse } from "../../security/sanitiser.js";
 import { registerTool } from "../registry.js";
 import { MonnifyApiError } from "../../utils/errors.js";
 import { errorResult } from "../../types/mcp.js";
+import { formatChargeCardToken } from "../../utils/format.js";
+import { getResponseFormat } from "../../utils/clientContext.js";
 import { ChargeCardTokenInputSchema } from "../../schemas/extended/collections.js";
+import { env } from "../../config/env.js";
 
 const definition: Tool = {
   name: "monnify_charge_card_token",
@@ -28,13 +31,15 @@ KEY OUTPUT FIELDS: transactionReference, paymentReference, amountPaid, totalPaya
 async function handler(args: unknown): Promise<McpToolResult> {
   try {
     const parsed = ChargeCardTokenInputSchema.parse(args);
+    const contractCode = parsed.contractCode ?? env().MONNIFY_CONTRACT_CODE;
+    const apiKey = parsed.apiKey ?? env().MONNIFY_API_KEY;
     const result = await apiPost<Record<string, unknown>>(
       "/api/v1/merchant/cards/charge-card-token",
-      parsed
+      { ...parsed, contractCode, apiKey }
     );
     const sanitised = sanitiseChargeCardTokenResponse(result);
     return {
-      content: [{ type: "text", text: JSON.stringify(sanitised, null, 2) }],
+      content: [{ type: "text", text: getResponseFormat() === "json" ? JSON.stringify(sanitised, null, 2) : formatChargeCardToken(sanitised as Record<string, unknown>) }],
     };
   } catch (error) {
     if (error instanceof z.ZodError) {

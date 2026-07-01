@@ -8,6 +8,8 @@ import { registerTool } from "../registry.js";
 import { MonnifyApiError } from "../../utils/errors.js";
 import { errorResult } from "../../types/mcp.js";
 import { GetTransactionStatusInputSchema } from "../../schemas/extended/collections.js";
+import { formatTransactionStatus } from "../../utils/format.js";
+import { getResponseFormat } from "../../utils/clientContext.js";
 
 const definition: Tool = {
   name: "monnify_get_transaction_status",
@@ -37,7 +39,7 @@ async function handler(args: unknown): Promise<McpToolResult> {
     );
     const sanitised = sanitiseTransactionStatusResponse(result);
     return {
-      content: [{ type: "text", text: JSON.stringify(sanitised, null, 2) }],
+      content: [{ type: "text", text: getResponseFormat() === "json" ? JSON.stringify(sanitised, null, 2) : formatTransactionStatus(sanitised as Record<string, unknown>) }],
     };
   } catch (error) {
     if (error instanceof z.ZodError) {

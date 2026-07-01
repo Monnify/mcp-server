@@ -6,6 +6,8 @@ import { apiGet } from "../../client/monnifyClient.js";
 import { registerTool } from "../registry.js";
 import { MonnifyApiError, ValidationError } from "../../utils/errors.js";
 import { errorResult } from "../../types/mcp.js";
+import { formatAllTransactions } from "../../utils/format.js";
+import { getResponseFormat } from "../../utils/clientContext.js";
 
 const InputSchema = z.object({
   page: z
@@ -116,21 +118,19 @@ async function handler(args: z.infer<typeof InputSchema>): Promise<McpToolResult
       currencyCode: tx["currencyCode"],
     }));
 
+    const meta = {
+      totalElements: result["totalElements"],
+      totalPages: result["totalPages"],
+      size: result["size"],
+      number: result["number"],
+    };
     return {
       content: [
         {
           type: "text",
-          text: JSON.stringify(
-            {
-              content: safeContent,
-              totalElements: result["totalElements"],
-              totalPages: result["totalPages"],
-              size: result["size"],
-              number: result["number"],
-            },
-            null,
-            2
-          ),
+          text: getResponseFormat() === "json"
+            ? JSON.stringify({ content: safeContent, ...meta }, null, 2)
+            : formatAllTransactions(safeContent, meta),
         },
       ],
     };

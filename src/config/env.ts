@@ -11,6 +11,8 @@ const EnvSchema = z.object({
   TRANSPORT: z.enum(["stdio", "http"]).default("stdio"),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   MONNIFY_ALLOWED_OPERATIONS: z.string().optional(),
+  MONNIFY_HTTP_TOKEN: z.string().optional(),
+  MONNIFY_RESPONSE_FORMAT: z.enum(["auto", "markdown", "json"]).default("auto"),
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),

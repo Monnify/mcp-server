@@ -28,6 +28,15 @@ program
     "--tools <categories>",
     "Comma-separated list of tool categories to enable: collections,directDebit,verification,utilities"
   )
+  .option(
+    "--format <format>",
+    "Response format override: auto (default), markdown, or json. Auto detects the client — Claude clients get markdown, engineering tools (VS Code, Copilot, Cursor) get JSON.",
+    "auto"
+  )
+  .option(
+    "--httpToken <token>",
+    "Bearer token to authenticate /mcp requests (only used with --transport=http). Strongly recommended when exposing the server beyond localhost."
+  )
   .parse(process.argv);
 
 const opts = program.opts<{
@@ -38,6 +47,8 @@ const opts = program.opts<{
   transport: string;
   port: string;
   tools?: string;
+  format: string;
+  httpToken?: string;
 }>();
 
 process.env["MONNIFY_API_KEY"] = opts.apiKey;
@@ -53,6 +64,14 @@ process.env["PORT"] = opts.port;
 
 if (opts.tools) {
   process.env["MONNIFY_ALLOWED_OPERATIONS"] = opts.tools;
+}
+
+if (opts.format && opts.format !== "auto") {
+  process.env["MONNIFY_RESPONSE_FORMAT"] = opts.format;
+}
+
+if (opts.httpToken) {
+  process.env["MONNIFY_HTTP_TOKEN"] = opts.httpToken;
 }
 
 await import("./index.js");

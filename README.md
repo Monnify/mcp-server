@@ -1,121 +1,80 @@
-# @monnify/mcp
+# @monnify/mcp-server
 
-[![CI](https://github.com/monnify/monnify-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/monnify/monnify-mcp/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/@monnify/mcp.svg)](https://www.npmjs.com/package/@monnify/mcp)
+[![CI](https://github.com/monnify/monnify-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/monnify/monnify-mcp-server/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@monnify/mcp-server.svg)](https://www.npmjs.com/package/@monnify/mcp-server)
 
-A production-grade [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for the [Monnify payment APIs](https://developers.monnify.com). Built in TypeScript with OpenAPI-derived type safety, purpose-built tool descriptions, and fintech-grade security guardrails.
+Give your AI assistant the ability to accept payments, verify identities, manage virtual accounts, and query transactions — all through [Monnify](https://monnify.com).
 
-## Overview
+This is an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server. Once connected, your AI client can talk directly to the Monnify API using plain language — no custom integration code required.
 
-This server exposes 22 named MCP tools across four categories: **collections**, **direct debit**, **verification**, and **utilities**. It is designed for use by AI agents (Claude, GPT, etc.) in regulated fintech environments where type safety, security, and idempotency are non-negotiable.
+---
 
-Key properties:
+## What you can do once it's connected
 
-- **OpenAPI-driven type safety** — types and schemas are generated from the Monnify OpenAPI spec; API changes surface as TypeScript compile errors
-- **Purpose-built tool descriptions** — every tool includes WHEN TO USE, PREREQUISITES, SIDE EFFECTS, and KEY OUTPUT FIELDS sections for accurate agent reasoning
-- **Response sanitisation** — whitelisted output fields prevent prompt injection via adversarial API responses
-- **Dual transport** — runs as a local stdio process (Claude Code) or a persistent HTTP server (team/production deployments)
-- **Zero-install via npx** — no local installation required for quick setup
+**Payment collection**
+> *"Initiate a payment of ₦15,000 for invoice #INV-2024-007 and send me the checkout link"*
+> *"Create a dedicated virtual account for customer cust_089 so they can pay anytime by bank transfer"*
+> *"Get me the status of transaction TRX-20240601-001"*
+> *"Show me all failed transactions from last week"*
 
-## Architecture
+**Identity verification**
+> *"Verify that account 0123456789 belongs to John Doe at GTBank"*
+> *"Check BVN 22345678901 — does the name and date of birth match?"*
+> *"Verify NIN 12345678901 for a customer named Amaka Obi"*
 
-```
-Monnify Postman Collection
-        ↓ postman-to-openapi
-openapi/monnify.yaml
-        ↓ openapi-typescript          ↓ openapi-zod-client
-src/types/monnify-api.d.ts    src/schemas/generated.ts
- (compile-time path types)      (runtime Zod schemas)
-                  ↓ extend with .describe()
-          src/schemas/extended/
-                  ↓
-          src/tools/**/*.ts
-          (named tool handlers)
-                  ↓
-          MCP Server (stdio | http)
-```
+**Account management**
+> *"What transactions came into reserved account ACCT-REF-001 this month?"*
+> *"Deallocate the virtual account for the customer who churned last quarter"*
+> *"Create a payment invoice for ₦50,000 that expires in 48 hours"*
 
-## Security Model
+**Engineering / integrations**
+> *"List all banks and their codes so I can populate a dropdown"*
+> *"Get the full details of transaction REF-XYZ for a support ticket"*
+> *"Process a partial refund of ₦2,500 on transaction TRX-20240601-009"*
 
-Five layers of defence:
-
-1. **Auth header stripping** — Axios error interceptor removes `Authorization` headers before any logging or rethrowing, preventing token leakage
-2. **Response sanitiser** — Every tool handler passes API responses through a whitelist sanitiser before returning to the MCP client; free-text fields that could contain adversarial instructions are blocked
-3. **Operation allow-list** — `MONNIFY_ALLOWED_OPERATIONS` env var restricts which tool categories are registered at startup; enables least-privilege deployments
-4. **Environment/URL consistency check** — Startup guard exits with code 1 if `MONNIFY_BASE_URL` and `MONNIFY_ENV` point to different environments; prevents accidental production operations
-5. **Sensitive field redaction** — Winston logger redacts `bvn`, `accountNumber`, `token`, `apiKey`, `secretKey`, `authorizationCode`, and `password` from all log output
+---
 
 ## Prerequisites
 
 - Node.js 20 or later
-- A [Monnify developer account](https://app.monnify.com/login) with API keys
-- API key, secret key, and contract code from Monnify Dashboard → Developer → API Keys & Contracts
+- A [Monnify account](https://app.monnify.com/login) with API access enabled
+- Your **API Key**, **Secret Key**, and **Contract Code** from the Monnify Dashboard → Developer → API Keys & Contracts
 
-## Zero-install Usage (npx)
+---
+
+## Quick start (no install needed)
 
 ```bash
-npx -y @monnify/mcp \
+npx -y @monnify/mcp-server \
   --apiKey=YOUR_API_KEY \
   --secretKey=YOUR_SECRET_KEY \
   --contractCode=YOUR_CONTRACT_CODE \
   --env=sandbox
 ```
 
-### CLI Options
+Switch `--env=sandbox` to `--env=production` when you're ready to go live.
 
-| Flag             | Required | Default   | Description                         |
-| ---------------- | -------- | --------- | ----------------------------------- |
-| `--apiKey`       | ✅       | —         | Monnify API key                     |
-| `--secretKey`    | ✅       | —         | Monnify secret key                  |
-| `--contractCode` | ✅       | —         | Monnify contract code               |
-| `--env`          | —        | `sandbox` | `sandbox` or `production`           |
-| `--transport`    | —        | `stdio`   | `stdio` or `http`                   |
-| `--port`         | —        | `3000`    | HTTP port (http transport only)     |
-| `--tools`        | —        | all       | Comma-separated category allow-list |
+---
 
-### MCP Client Integration
+## Connect to your AI client
 
-This server uses the open [Model Context Protocol](https://modelcontextprotocol.io) and works with any MCP-compatible client. The `command` and `args` are identical across all clients — only the config key and file location differ.
+The server speaks the MCP stdio protocol, which is supported by all major AI tools. Pick yours below.
 
-| Client                   | Config key     | Config file                                                          |
-| ------------------------ | -------------- | -------------------------------------------------------------------- |
-| Claude Code              | `"servers"`    | `~/.claude/claude_desktop_config.json` or project `.claude/mcp.json` |
-| Claude Desktop           | `"mcpServers"` | `~/Library/Application Support/Claude/claude_desktop_config.json`    |
-| Cursor                   | `"mcpServers"` | `~/.cursor/mcp.json`                                                 |
-| Windsurf                 | `"mcpServers"` | `~/.codeium/windsurf/mcp_config.json`                                |
-| GitHub Copilot (VS Code) | `"servers"`    | `.vscode/mcp.json` in your workspace                                 |
+---
 
-**Claude Code**
+### Claude Desktop
 
-```json
-{
-  "servers": {
-    "monnify-mcp": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@monnify/mcp",
-        "--apiKey=YOUR_API_KEY",
-        "--secretKey=YOUR_SECRET_KEY",
-        "--contractCode=YOUR_CONTRACT_CODE",
-        "--env=sandbox"
-      ]
-    }
-  }
-}
-```
-
-**Claude Desktop / Cursor / Windsurf**
+**Mac:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
-    "monnify-mcp": {
+    "monnify": {
       "command": "npx",
       "args": [
         "-y",
-        "@monnify/mcp",
+        "@monnify/mcp-server",
         "--apiKey=YOUR_API_KEY",
         "--secretKey=YOUR_SECRET_KEY",
         "--contractCode=YOUR_CONTRACT_CODE",
@@ -126,131 +85,479 @@ This server uses the open [Model Context Protocol](https://modelcontextprotocol.
 }
 ```
 
-**GitHub Copilot (VS Code)** — create `.vscode/mcp.json` in your workspace with the same shape as the Claude Code config above (`"servers"` key).
+Restart Claude Desktop after saving. You will see "monnify" appear in the tools panel.
 
-> **ChatGPT, Gemini (web), Lovable** — these clients do not have an MCP runtime. Use the [HTTP transport](#http-transport) instead and connect via a custom plugin or function-calling integration.
+---
 
-## Installation from Source
+### Claude Code (CLI)
+
+**Project-level** — add to `.claude/mcp.json` in your repo (checked in, shared with your team):
+
+```json
+{
+  "servers": {
+    "monnify": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@monnify/mcp-server",
+        "--apiKey=YOUR_API_KEY",
+        "--secretKey=YOUR_SECRET_KEY",
+        "--contractCode=YOUR_CONTRACT_CODE",
+        "--env=sandbox"
+      ]
+    }
+  }
+}
+```
+
+**Global** — add to `~/.claude/claude_desktop_config.json` so it's available in every Claude Code session:
 
 ```bash
-git clone https://github.com/monnify/monnify-mcp.git
-cd monnify-mcp
+claude mcp add monnify \
+  -- npx -y @monnify/mcp-server \
+  --apiKey=YOUR_API_KEY \
+  --secretKey=YOUR_SECRET_KEY \
+  --contractCode=YOUR_CONTRACT_CODE \
+  --env=sandbox
+```
+
+Verify it loaded:
+```bash
+claude mcp list
+```
+
+---
+
+### ChatGPT Desktop (OpenAI)
+
+**Mac:** `~/Library/Application Support/ChatGPT/mcp.json`
+**Windows:** `%APPDATA%\ChatGPT\mcp.json`
+
+```json
+{
+  "mcpServers": {
+    "monnify": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@monnify/mcp-server",
+        "--apiKey=YOUR_API_KEY",
+        "--secretKey=YOUR_SECRET_KEY",
+        "--contractCode=YOUR_CONTRACT_CODE",
+        "--env=sandbox"
+      ]
+    }
+  }
+}
+```
+
+Restart ChatGPT Desktop. MCP tools will appear in the tool-use panel when you start a new conversation.
+
+---
+
+### Gemini CLI
+
+Add to `~/.gemini/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "monnify": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@monnify/mcp-server",
+        "--apiKey=YOUR_API_KEY",
+        "--secretKey=YOUR_SECRET_KEY",
+        "--contractCode=YOUR_CONTRACT_CODE",
+        "--env=sandbox"
+      ]
+    }
+  }
+}
+```
+
+Run `gemini` in your terminal — type `@monnify` to confirm the server is available.
+
+---
+
+### Cursor
+
+Add to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` in your project root:
+
+```json
+{
+  "mcpServers": {
+    "monnify": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@monnify/mcp-server",
+        "--apiKey=YOUR_API_KEY",
+        "--secretKey=YOUR_SECRET_KEY",
+        "--contractCode=YOUR_CONTRACT_CODE",
+        "--env=sandbox"
+      ]
+    }
+  }
+}
+```
+
+Open Cursor Settings → MCP to confirm the server shows as active.
+
+---
+
+### VS Code + GitHub Copilot
+
+Create `.vscode/mcp.json` in your workspace root:
+
+```json
+{
+  "servers": {
+    "monnify": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@monnify/mcp-server",
+        "--apiKey=YOUR_API_KEY",
+        "--secretKey=YOUR_SECRET_KEY",
+        "--contractCode=YOUR_CONTRACT_CODE",
+        "--env=sandbox"
+      ]
+    }
+  }
+}
+```
+
+Open the Copilot Chat panel, switch to **Agent mode**, and the Monnify tools will be available. Commit `.vscode/mcp.json` to share the setup with your team (credentials should come from environment variables — see [using environment variables](#using-environment-variables)).
+
+---
+
+### Windsurf
+
+Add to `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "monnify": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@monnify/mcp-server",
+        "--apiKey=YOUR_API_KEY",
+        "--secretKey=YOUR_SECRET_KEY",
+        "--contractCode=YOUR_CONTRACT_CODE",
+        "--env=sandbox"
+      ]
+    }
+  }
+}
+```
+
+---
+
+### Zed
+
+Add to `~/.config/zed/settings.json` under `"context_servers"`:
+
+```json
+{
+  "context_servers": {
+    "monnify": {
+      "command": {
+        "path": "npx",
+        "args": [
+          "-y",
+          "@monnify/mcp-server",
+          "--apiKey=YOUR_API_KEY",
+          "--secretKey=YOUR_SECRET_KEY",
+          "--contractCode=YOUR_CONTRACT_CODE",
+          "--env=sandbox"
+        ]
+      }
+    }
+  }
+}
+```
+
+---
+
+### Continue.dev (VS Code / JetBrains)
+
+Add to `~/.continue/config.json` under `"mcpServers"`:
+
+```json
+{
+  "mcpServers": [
+    {
+      "name": "monnify",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@monnify/mcp-server",
+        "--apiKey=YOUR_API_KEY",
+        "--secretKey=YOUR_SECRET_KEY",
+        "--contractCode=YOUR_CONTRACT_CODE",
+        "--env=sandbox"
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## Using environment variables
+
+Avoid hardcoding credentials in config files by passing them via environment variables instead:
+
+```json
+{
+  "mcpServers": {
+    "monnify": {
+      "command": "npx",
+      "args": ["-y", "@monnify/mcp-server"],
+      "env": {
+        "MONNIFY_API_KEY": "YOUR_API_KEY",
+        "MONNIFY_SECRET_KEY": "YOUR_SECRET_KEY",
+        "MONNIFY_CONTRACT_CODE": "YOUR_CONTRACT_CODE",
+        "MONNIFY_ENV": "sandbox"
+      }
+    }
+  }
+}
+```
+
+All CLI flags have an equivalent environment variable:
+
+| CLI flag          | Environment variable        |
+|-------------------|-----------------------------|
+| `--apiKey`        | `MONNIFY_API_KEY`           |
+| `--secretKey`     | `MONNIFY_SECRET_KEY`        |
+| `--contractCode`  | `MONNIFY_CONTRACT_CODE`     |
+| `--env`           | `MONNIFY_ENV`               |
+| `--transport`     | `MONNIFY_TRANSPORT`         |
+| `--port`          | `MONNIFY_PORT`              |
+| `--tools`         | `MONNIFY_TOOLS`             |
+| `--format`        | `MONNIFY_RESPONSE_FORMAT`   |
+
+---
+
+## Smart response formatting
+
+The server automatically detects which client is connecting and adapts its responses:
+
+| Client | Response format |
+|--------|----------------|
+| Claude Desktop, Claude Code CLI | Conversational Markdown with status icons, Naira formatting, and human-readable dates |
+| Cursor, VS Code Copilot, Windsurf, Zed, Continue.dev | Clean JSON — machine-readable and easy to pipe into other tools |
+| ChatGPT, Gemini | Conversational Markdown |
+
+**Override the format** with the `--format` flag if the auto-detection doesn't match your workflow:
+
+```bash
+# Force JSON for all clients (e.g. a custom integration)
+npx -y @monnify/mcp-server --apiKey=... --format=json
+
+# Force Markdown for all clients
+npx -y @monnify/mcp-server --apiKey=... --format=markdown
+```
+
+**What conversational responses look like:**
+
+```
+✅ Payment Initiated
+
+Amount:      ₦15,000.00
+Reference:   PAY-20240601-007
+Customer:    John Doe (john@example.com)
+Checkout:    https://checkout.monnify.com/pay/abc123
+Expires:     1 Jul 2024, 11:59 PM WAT
+```
+
+**What JSON responses look like (for engineering tools):**
+
+```json
+{
+  "paymentReference": "PAY-20240601-007",
+  "totalPayable": 15000,
+  "checkoutUrl": "https://checkout.monnify.com/pay/abc123",
+  "paymentStatus": "PENDING"
+}
+```
+
+---
+
+## All options
+
+| Flag             | Default   | Description                                         |
+|------------------|-----------|-----------------------------------------------------|
+| `--apiKey`       | —         | Your Monnify API key (required)                     |
+| `--secretKey`    | —         | Your Monnify secret key (required)                  |
+| `--contractCode` | —         | Your Monnify contract code (required)               |
+| `--env`          | `sandbox` | `sandbox` or `production`                           |
+| `--transport`    | `stdio`   | `stdio` (local clients) or `http` (team deployments)|
+| `--port`         | `3000`    | Port to listen on when using `--transport=http`     |
+| `--tools`        | all       | Comma-separated list of tool categories (see below) |
+| `--format`       | `auto`    | `auto`, `markdown`, or `json`                       |
+| `--httpToken`    | —         | Bearer token to authenticate HTTP `/mcp` requests   |
+
+---
+
+## Available tools (25)
+
+### Collections (15)
+
+| Tool | What it does |
+|------|--------------|
+| `monnify_initiate_payment` | Creates a payment and returns a checkout URL |
+| `monnify_reserve_account` | Reserves a virtual bank account for a customer |
+| `monnify_get_reserved_account` | Fetches details and status of a reserved account |
+| `monnify_get_reserved_account_transactions` | Lists transactions received on a reserved account |
+| `monnify_deallocate_reserved_account` | Permanently removes a reserved account |
+| `monnify_get_transaction_status` | Checks the status of a transaction by reference |
+| `monnify_get_transaction_details` | Fetches full details of a transaction |
+| `monnify_get_all_transactions` | Lists transactions with filters and pagination |
+| `monnify_create_invoice` | Creates a payment invoice with an expiry date |
+| `monnify_process_refund` | Issues a full or partial refund |
+| `monnify_pay_with_bank_transfer` | Starts a pay-by-bank-transfer flow |
+| `monnify_charge_card` | Charges a card with PAN and CVV |
+| `monnify_charge_card_token` | Charges a previously saved card token |
+| `monnify_authorise_card_otp` | Submits OTP to complete a card charge |
+| `monnify_authorise_card_3ds` | Completes 3DS verification for a card charge |
+
+### Direct Debit (5)
+
+| Tool | What it does |
+|------|--------------|
+| `monnify_create_mandate` | Creates a direct debit mandate |
+| `monnify_get_mandate_status` | Checks if a mandate is active and ready to debit |
+| `monnify_debit_mandate` | Debits an active mandate |
+| `monnify_get_mandate_debit_status` | Checks the status of a debit attempt |
+| `monnify_cancel_mandate` | Cancels a mandate permanently |
+
+### Verification (4)
+
+| Tool | What it does |
+|------|--------------|
+| `monnify_verify_bank_account` | Verifies an account number and returns the account name |
+| `monnify_verify_bvn` | Matches a BVN against name, date of birth, and phone number |
+| `monnify_verify_bvn_info` | Checks whether all submitted BVN details match holistically |
+| `monnify_verify_nin` | Verifies a NIN and returns the associated record |
+
+### Utilities (1)
+
+| Tool | What it does |
+|------|--------------|
+| `monnify_get_supported_banks` | Lists all supported banks and their codes |
+
+---
+
+## Limiting tool access
+
+Scope the server to only the tools your use case needs. This reduces the surface area exposed to the AI client and keeps the tool list focused.
+
+```bash
+# Verification and utilities only (e.g. a KYC onboarding agent)
+npx -y @monnify/mcp-server --apiKey=... --secretKey=... --contractCode=... --tools=verification,utilities
+
+# Collections only (e.g. a payment support agent)
+npx -y @monnify/mcp-server --apiKey=... --secretKey=... --contractCode=... --tools=collections
+
+# Collections + verification (e.g. a full checkout agent)
+npx -y @monnify/mcp-server --apiKey=... --secretKey=... --contractCode=... --tools=collections,verification
+```
+
+Available categories: `collections`, `directDebit`, `verification`, `utilities`
+
+---
+
+## Running as an HTTP server (team deployments)
+
+Deploy a single shared instance and connect multiple clients to it — useful for team environments, CI pipelines, or production AI integrations.
+
+**Step 1 — Generate a bearer token:**
+
+```bash
+openssl rand -hex 32
+# e.g. a3f8c2d1e4b5a6...
+```
+
+**Step 2 — Start the server:**
+
+```bash
+npx -y @monnify/mcp-server \
+  --apiKey=YOUR_API_KEY \
+  --secretKey=YOUR_SECRET_KEY \
+  --contractCode=YOUR_CONTRACT_CODE \
+  --env=production \
+  --transport=http \
+  --port=3000 \
+  --httpToken=YOUR_GENERATED_TOKEN
+```
+
+The server will reject any `/mcp` request that does not carry `Authorization: Bearer YOUR_GENERATED_TOKEN`. If you start without `--httpToken`, it starts unauthenticated and logs a warning — acceptable for local development, not for any internet-facing deployment.
+
+**Step 3 — Connect your AI client:**
+
+```bash
+# Claude Code
+claude mcp add monnify --transport http http://localhost:3000/mcp
+```
+
+For clients that accept a custom header, set `Authorization: Bearer YOUR_GENERATED_TOKEN` alongside the endpoint URL.
+
+**Step 4 — Put HTTPS in front of it.** Terminate TLS at a reverse proxy (nginx, Caddy, Cloudflare Tunnel) before exposing the server outside your local network. Never send credentials over plain HTTP.
+
+Health check (no auth required): `GET /health`
+
+---
+
+## Testing locally without deploying
+
+Run the server directly from source against the sandbox environment:
+
+```bash
+git clone https://github.com/monnify/monnify-mcp-server
+cd monnify-mcp-server
 npm install
-cp .env.example .env
-# Edit .env with your Monnify credentials
-npm run generate   # Generate types from OpenAPI spec
 npm run build
-npm start
+
+node build/cli.js \
+  --apiKey=YOUR_API_KEY \
+  --secretKey=YOUR_SECRET_KEY \
+  --contractCode=YOUR_CONTRACT_CODE \
+  --env=sandbox
 ```
 
-## Regenerating Types
-
-Run after any update to `openapi/monnify.yaml`:
+Or use the [MCP Inspector](https://github.com/modelcontextprotocol/inspector) to explore tools interactively:
 
 ```bash
-npm run generate
-npm run typecheck  # Verify no type errors introduced
+npx @modelcontextprotocol/inspector \
+  node $(pwd)/build/cli.js \
+  --apiKey=YOUR_API_KEY \
+  --secretKey=YOUR_SECRET_KEY \
+  --contractCode=YOUR_CONTRACT_CODE \
+  --env=sandbox
 ```
 
-The `generate` script runs `openapi-typescript` and `openapi-zod-client` in sequence.
+Open `http://localhost:5173` in your browser to browse and invoke tools.
 
-## Available Tools (22)
+---
 
-### Collections
+## Security
 
-| Tool                              | Description                                               |
-| --------------------------------- | --------------------------------------------------------- |
-| `monnify_initiate_payment`        | Initiates a payment and returns a checkout URL            |
-| `monnify_reserve_account`         | Reserves a virtual bank account for persistent collection |
-| `monnify_get_transaction_status`  | Queries transaction status by reference                   |
-| `monnify_get_transaction_details` | Fetches full details of a transaction                     |
-| `monnify_get_all_transactions`    | Lists transactions with pagination and filters            |
-| `monnify_create_invoice`          | Creates a payment invoice with expiry date                |
-| `monnify_process_refund`          | Initiates a full or partial refund                        |
-| `monnify_pay_with_bank_transfer`  | Initiates a pay-by-bank-transfer flow                     |
-| `monnify_charge_card`             | Charges a card directly with PAN and CVV                  |
-| `monnify_charge_card_token`       | Charges a previously tokenised card                       |
-| `monnify_authorise_card_otp`      | Submits OTP to complete a card charge                     |
-| `monnify_authorise_card_3ds`      | Completes 3DS authorisation for a card charge             |
+- Credentials are passed as CLI args or environment variables and never stored
+- All API responses are filtered through a whitelist — internal Monnify fields are stripped before returning data to the AI client
+- Destructive tools (deallocate, cancel mandate) are clearly labelled in their descriptions so the AI client warns before executing them
+- Scope tool access with `--tools` to only expose what a given agent needs
 
-### Direct Debit (Mandate Lifecycle)
-
-| Tool                               | Description                                               |
-| ---------------------------------- | --------------------------------------------------------- |
-| `monnify_create_mandate`           | Creates a mandate (step 1 — always first)                 |
-| `monnify_get_mandate_status`       | Checks mandate status (must be ACTIVATED before debiting) |
-| `monnify_debit_mandate`            | Debits an ACTIVATED mandate                               |
-| `monnify_get_mandate_debit_status` | Checks status of a debit attempt                          |
-| `monnify_cancel_mandate`           | Cancels a mandate permanently                             |
-
-### Verification
-
-| Tool                          | Description                                     |
-| ----------------------------- | ----------------------------------------------- |
-| `monnify_verify_bank_account` | Verifies account number and returns holder name |
-| `monnify_verify_bvn`          | Matches BVN against name, DOB, and phone        |
-| `monnify_verify_bvn_info`     | Verifies all BVN details match (single boolean) |
-| `monnify_verify_nin`          | Verifies NIN details and returns record fields  |
-
-### Utilities
-
-| Tool                          | Description                          |
-| ----------------------------- | ------------------------------------ |
-| `monnify_get_supported_banks` | Lists all supported banks with codes |
-
-## Required Monnify Permissions
-
-| Tool Category                     | Required Permission               |
-| --------------------------------- | --------------------------------- |
-| `utilities`                       | Basic API access                  |
-| `verification`                    | Identity Verification API         |
-| `collections`                     | Collections API                   |
-| `collections` (reserved accounts) | Reserved Accounts feature enabled |
-| `directDebit`                     | Direct Debit API                  |
-
-### Least-privilege Deployment Examples
-
-```bash
-# Read-only (support tooling)
-MONNIFY_ALLOWED_OPERATIONS=verification,utilities
-
-# Collections only
-MONNIFY_ALLOWED_OPERATIONS=collections,verification,utilities
-
-# Full access (default when unset)
-# all categories enabled
-```
-
-## HTTP Transport
-
-For persistent team deployments:
-
-```bash
-TRANSPORT=http PORT=3000 node build/index.js
-```
-
-Connect via:
-
-```bash
-claude mcp add monnify-mcp --transport http http://localhost:3000/mcp
-```
-
-Health check: `GET /health` returns `{ status: "ok", environment: "sandbox", timestamp: "..." }`.
-
-**Security note:** Add `Authorization: Bearer <token>` middleware before `/mcp` in production.
-
-## Testing
-
-```bash
-npm test              # Run all tests once
-npm run test:watch    # Watch mode
-npm run typecheck     # TypeScript type checking only
-```
-
-## Automated Dependency Updates
-
-[Renovate](https://docs.renovatebot.com) is configured in `renovate.json`. Patch updates and minor updates to the MCP SDK, Zod, Axios, and Winston auto-merge. Major updates require manual review.
+---
 
 ## License
 
-MIT
+MIT — built by the [Monnify](https://monnify.com) team.

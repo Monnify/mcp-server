@@ -7,6 +7,8 @@ import { sanitiseCancelMandateResponse } from "../../security/sanitiser.js";
 import { registerTool } from "../registry.js";
 import { MonnifyApiError } from "../../utils/errors.js";
 import { errorResult } from "../../types/mcp.js";
+import { formatCancelMandate } from "../../utils/format.js";
+import { getResponseFormat } from "../../utils/clientContext.js";
 import { CancelMandateInputSchema } from "../../schemas/extended/directDebit.js";
 
 const definition: Tool = {
@@ -33,7 +35,7 @@ async function handler(args: unknown): Promise<McpToolResult> {
     );
     const sanitised = sanitiseCancelMandateResponse(result);
     return {
-      content: [{ type: "text", text: JSON.stringify(sanitised, null, 2) }],
+      content: [{ type: "text", text: getResponseFormat() === "json" ? JSON.stringify(sanitised, null, 2) : formatCancelMandate(sanitised as Record<string, unknown>) }],
     };
   } catch (error) {
     if (error instanceof z.ZodError) {

@@ -7,7 +7,10 @@ import { sanitiseInvoiceResponse } from "../../security/sanitiser.js";
 import { registerTool } from "../registry.js";
 import { MonnifyApiError } from "../../utils/errors.js";
 import { errorResult } from "../../types/mcp.js";
+import { formatCreateInvoice } from "../../utils/format.js";
+import { getResponseFormat } from "../../utils/clientContext.js";
 import { CreateInvoiceInputSchema } from "../../schemas/extended/collections.js";
+import { env } from "../../config/env.js";
 
 const definition: Tool = {
   name: "monnify_create_invoice",
@@ -28,13 +31,14 @@ KEY OUTPUT FIELDS: invoiceReference, invoiceStatus, checkoutUrl (share with cust
 async function handler(args: unknown): Promise<McpToolResult> {
   try {
     const parsed = CreateInvoiceInputSchema.parse(args);
+    const contractCode = parsed.contractCode ?? env().MONNIFY_CONTRACT_CODE;
     const result = await apiPost<Record<string, unknown>>(
       "/api/v1/invoice/create",
       parsed
     );
     const sanitised = sanitiseInvoiceResponse(result);
     return {
-      content: [{ type: "text", text: JSON.stringify(sanitised, null, 2) }],
+      content: [{ type: "text", text: getResponseFormat() === "json" ? JSON.stringify(sanitised, null, 2) : formatCreateInvoice(sanitised as Record<string, unknown>) }],
     };
   } catch (error) {
     if (error instanceof z.ZodError) {

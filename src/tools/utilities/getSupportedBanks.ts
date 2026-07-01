@@ -7,6 +7,8 @@ import { sanitiseBankListResponse } from "../../security/sanitiser.js";
 import { registerTool } from "../registry.js";
 import { MonnifyApiError, ValidationError } from "../../utils/errors.js";
 import { errorResult } from "../../types/mcp.js";
+import { formatSupportedBanks } from "../../utils/format.js";
+import { getResponseFormat } from "../../utils/clientContext.js";
 
 const InputSchema = z.object({});
 
@@ -34,12 +36,7 @@ async function handler(_args: z.infer<typeof InputSchema>): Promise<McpToolResul
       Array.isArray(banks) ? banks : []
     );
     return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(sanitised, null, 2),
-        },
-      ],
+      content: [{ type: "text", text: formatSupportedBanks(sanitised as Array<Record<string, unknown>>) }],
     };
   } catch (error) {
     if (error instanceof MonnifyApiError) {

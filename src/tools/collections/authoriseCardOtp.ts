@@ -7,6 +7,8 @@ import { sanitiseAuthoriseCardOtpResponse } from "../../security/sanitiser.js";
 import { registerTool } from "../registry.js";
 import { MonnifyApiError } from "../../utils/errors.js";
 import { errorResult } from "../../types/mcp.js";
+import { formatAuthoriseCardOtp } from "../../utils/format.js";
+import { getResponseFormat } from "../../utils/clientContext.js";
 import { AuthoriseCardOtpInputSchema } from "../../schemas/extended/collections.js";
 
 const definition: Tool = {
@@ -34,7 +36,7 @@ async function handler(args: unknown): Promise<McpToolResult> {
     );
     const sanitised = sanitiseAuthoriseCardOtpResponse(result);
     return {
-      content: [{ type: "text", text: JSON.stringify(sanitised, null, 2) }],
+      content: [{ type: "text", text: getResponseFormat() === "json" ? JSON.stringify(sanitised, null, 2) : formatAuthoriseCardOtp(sanitised as Record<string, unknown>) }],
     };
   } catch (error) {
     if (error instanceof z.ZodError) {

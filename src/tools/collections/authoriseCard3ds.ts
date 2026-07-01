@@ -7,7 +7,10 @@ import { sanitiseAuthoriseCard3dsResponse } from "../../security/sanitiser.js";
 import { registerTool } from "../registry.js";
 import { MonnifyApiError } from "../../utils/errors.js";
 import { errorResult } from "../../types/mcp.js";
+import { formatAuthoriseCard3ds } from "../../utils/format.js";
+import { getResponseFormat } from "../../utils/clientContext.js";
 import { AuthoriseCard3dsInputSchema } from "../../schemas/extended/collections.js";
+import { env } from "../../config/env.js";
 
 const definition: Tool = {
   name: "monnify_authorise_card_3ds",
@@ -28,13 +31,14 @@ KEY OUTPUT FIELDS: redirectUrl (send the customer to this URL to complete 3DS au
 async function handler(args: unknown): Promise<McpToolResult> {
   try {
     const parsed = AuthoriseCard3dsInputSchema.parse(args);
+    const apiKey = parsed.apiKey ?? env().MONNIFY_API_KEY;
     const result = await apiPost<Record<string, unknown>>(
       "/api/v1/sdk/cards/secure-3d/authorize",
-      parsed
+      { ...parsed, apiKey }
     );
     const sanitised = sanitiseAuthoriseCard3dsResponse(result);
     return {
-      content: [{ type: "text", text: JSON.stringify(sanitised, null, 2) }],
+      content: [{ type: "text", text: getResponseFormat() === "json" ? JSON.stringify(sanitised, null, 2) : formatAuthoriseCard3ds(sanitised as Record<string, unknown>) }],
     };
   } catch (error) {
     if (error instanceof z.ZodError) {

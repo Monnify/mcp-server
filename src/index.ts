@@ -13,9 +13,15 @@ import {
 import { logger } from "./utils/logger.js";
 import { MonnifyApiError, ValidationError } from "./utils/errors.js";
 import { errorResult } from "./types/mcp.js";
+import { setClientName, setFormatOverride } from "./utils/clientContext.js";
 
 validateEnv();
 assertEnvironmentConsistency(env());
+
+const formatEnv = env().MONNIFY_RESPONSE_FORMAT;
+if (formatEnv !== "auto") {
+  setFormatOverride(formatEnv as "markdown" | "json");
+}
 
 if (isOperationAllowed("utilities", env())) {
   await import("./tools/utilities/getSupportedBanks.js");
@@ -29,6 +35,9 @@ await import("./tools/verification/verifyBvnInfo.js");
 if (isOperationAllowed("collections", env())) {
   await import("./tools/collections/initiatePayment.js");
   await import("./tools/collections/reserveAccount.js");
+  await import("./tools/collections/getReservedAccount.js");
+  await import("./tools/collections/getReservedAccountTransactions.js");
+  await import("./tools/collections/deallocateReservedAccount.js");
   await import("./tools/collections/getTransactionStatus.js");
   await import("./tools/collections/getTransactionDetails.js");
   await import("./tools/collections/getAllTransactions.js");
@@ -52,6 +61,12 @@ export const server = new Server(
   { name: "monnify-mcp", version: "1.0.0" },
   { capabilities: { tools: {} } }
 );
+
+server.oninitialized = () => {
+  const clientName = server.getClientVersion()?.name;
+  setClientName(clientName);
+  logger.info("MCP client connected", { client: clientName ?? "unknown" });
+};
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: getAllToolDefinitions(),

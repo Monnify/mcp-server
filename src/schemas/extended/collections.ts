@@ -39,8 +39,9 @@ export const InitiatePaymentInputSchema = InitiatePaymentBodySchema.extend({
   contractCode: z
     .string()
     .min(1)
+    .optional()
     .describe(
-      "Your Monnify contract code. Found in Dashboard → Settings → Contract Codes."
+      "Your Monnify contract code. Defaults to the contract code supplied at server startup — only override if you need a different contract."
     ),
   redirectUrl: z
     .string()
@@ -96,7 +97,7 @@ export const ReserveAccountInputSchema = ReserveAccountBodySchema.extend({
     .string()
     .min(1)
     .describe("Display name for the reserved account."),
-  contractCode: z.string().min(1).describe("Your Monnify contract code."),
+  contractCode: z.string().min(1).optional().describe("Your Monnify contract code. Defaults to the contract code supplied at server startup."),
   customerEmail: z.string().email().describe("Customer email address."),
   customerName: z.string().min(1).describe("Full name of the customer."),
   currencyCode: z
@@ -212,7 +213,7 @@ export const CreateInvoiceInputSchema = CreateInvoiceBodySchema.extend({
     .string()
     .max(100)
     .describe("Description of the invoice — shown to the customer."),
-  contractCode: z.string().min(1).describe("Your Monnify contract code."),
+  contractCode: z.string().min(1).optional().describe("Your Monnify contract code. Defaults to the contract code supplied at server startup."),
   customerEmail: z.string().email().describe("Customer email address."),
   customerName: z.string().min(1).describe("Full name of the customer."),
   currencyCode: z
@@ -347,8 +348,9 @@ export const AuthoriseCard3dsInputSchema = AuthoriseCard3dsBodySchema.extend({
   apiKey: z
     .string()
     .min(1)
+    .optional()
     .describe(
-      "The merchant's monnify provided API key. Required to complete 3DS authorisation."
+      "Your Monnify API key. Defaults to the API key supplied at server startup."
     ),
   card: z
     .object({
@@ -409,11 +411,13 @@ export const ChargeCardTokenInputSchema = z.object({
   contractCode: z
     .string()
     .min(1)
-    .describe("Your Monnify contract code."),
+    .optional()
+    .describe("Your Monnify contract code. Defaults to the contract code supplied at server startup."),
   apiKey: z
     .string()
     .min(1)
-    .describe("Your Monnify API key (e.g. 'MK_PROD_WTZLS10MX6'). Found in Dashboard → Settings → API Keys."),
+    .optional()
+    .describe("Your Monnify API key. Defaults to the API key supplied at server startup."),
   customerName: z
     .string()
     .optional()

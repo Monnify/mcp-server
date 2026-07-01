@@ -7,7 +7,10 @@ import { sanitiseReserveAccountResponse } from "../../security/sanitiser.js";
 import { registerTool } from "../registry.js";
 import { MonnifyApiError } from "../../utils/errors.js";
 import { errorResult } from "../../types/mcp.js";
+import { formatReserveAccount } from "../../utils/format.js";
+import { getResponseFormat } from "../../utils/clientContext.js";
 import { ReserveAccountInputSchema } from "../../schemas/extended/collections.js";
+import { env } from "../../config/env.js";
 
 const definition: Tool = {
   name: "monnify_reserve_account",
@@ -28,13 +31,14 @@ KEY OUTPUT FIELDS: accountReference, accountName, accounts (array of virtual acc
 async function handler(args: unknown): Promise<McpToolResult> {
   try {
     const parsed = ReserveAccountInputSchema.parse(args);
+    const contractCode = parsed.contractCode ?? env().MONNIFY_CONTRACT_CODE;
     const result = await apiPost<Record<string, unknown>>(
       "/api/v2/bank-transfer/reserved-accounts",
-      parsed
+      { ...parsed, contractCode }
     );
     const sanitised = sanitiseReserveAccountResponse(result);
     return {
-      content: [{ type: "text", text: JSON.stringify(sanitised, null, 2) }],
+      content: [{ type: "text", text: getResponseFormat() === "json" ? JSON.stringify(sanitised, null, 2) : formatReserveAccount(sanitised as Record<string, unknown>) }],
     };
   } catch (error) {
     if (error instanceof z.ZodError) {

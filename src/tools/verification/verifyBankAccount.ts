@@ -8,6 +8,8 @@ import { registerTool } from "../registry.js";
 import { MonnifyApiError, ValidationError } from "../../utils/errors.js";
 import { errorResult } from "../../types/mcp.js";
 import { VerifyBankAccountInputSchema } from "../../schemas/extended/verification.js";
+import { formatBankAccountVerification } from "../../utils/format.js";
+import { getResponseFormat } from "../../utils/clientContext.js";
 
 const definition: Tool = {
   name: "monnify_verify_bank_account",
@@ -37,7 +39,7 @@ async function handler(args: unknown): Promise<McpToolResult> {
     );
     const sanitised = sanitiseBankAccountResponse(result);
     return {
-      content: [{ type: "text", text: JSON.stringify(sanitised, null, 2) }],
+      content: [{ type: "text", text: getResponseFormat() === "json" ? JSON.stringify(sanitised, null, 2) : formatBankAccountVerification(sanitised as Record<string, unknown>) }],
     };
   } catch (error) {
     if (error instanceof z.ZodError) {

@@ -8,7 +8,7 @@ import { registerTool } from "../registry.js";
 import { MonnifyApiError } from "../../utils/errors.js";
 import { errorResult } from "../../types/mcp.js";
 import { InitiatePaymentInputSchema } from "../../schemas/extended/collections.js";
-import { env } from "../../config/env.js";
+import { tryEnv } from "../../config/env.js";
 import { formatInitiatePayment } from "../../utils/format.js";
 import { getResponseFormat } from "../../utils/clientContext.js";
 
@@ -31,7 +31,13 @@ KEY OUTPUT FIELDS: transactionReference (Monnify's ref), paymentReference (your 
 async function handler(args: unknown): Promise<McpToolResult> {
   try {
     const parsed = InitiatePaymentInputSchema.parse(args);
-    const contractCode = parsed.contractCode ?? env().MONNIFY_CONTRACT_CODE;
+    const contractCode = parsed.contractCode ?? tryEnv()?.MONNIFY_CONTRACT_CODE;
+    if (!contractCode) {
+      return {
+        content: [{ type: "text", text: "Validation failed:\n  - contractCode: Required (or configure MONNIFY_CONTRACT_CODE environment variable)" }],
+        isError: true,
+      };
+    }
     const result = await apiPost<Record<string, unknown>>(
       "/api/v1/merchant/transactions/init-transaction",
       { ...parsed, contractCode }

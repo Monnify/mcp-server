@@ -36,7 +36,7 @@ async function handler(_args: z.infer<typeof InputSchema>): Promise<McpToolResul
       Array.isArray(banks) ? banks : []
     );
     return {
-      content: [{ type: "text", text: formatSupportedBanks(sanitised as Array<Record<string, unknown>>) }],
+      content: [{ type: "text", text: getResponseFormat() === "json" ? JSON.stringify(sanitised, null, 2) : formatSupportedBanks(sanitised as Array<Record<string, unknown>>) }],
     };
   } catch (error) {
     if (error instanceof MonnifyApiError) {

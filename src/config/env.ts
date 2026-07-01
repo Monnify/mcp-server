@@ -43,3 +43,5 @@ export const env = (): Env => {
     throw new Error("validateEnv() must be called before accessing env()");
   return _env;
 };
+
+export const tryEnv = (): Env | undefined => _env;

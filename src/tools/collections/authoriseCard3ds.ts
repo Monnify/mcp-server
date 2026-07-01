@@ -10,7 +10,7 @@ import { errorResult } from "../../types/mcp.js";
 import { formatAuthoriseCard3ds } from "../../utils/format.js";
 import { getResponseFormat } from "../../utils/clientContext.js";
 import { AuthoriseCard3dsInputSchema } from "../../schemas/extended/collections.js";
-import { env } from "../../config/env.js";
+import { tryEnv } from "../../config/env.js";
 
 const definition: Tool = {
   name: "monnify_authorise_card_3ds",
@@ -31,7 +31,13 @@ KEY OUTPUT FIELDS: redirectUrl (send the customer to this URL to complete 3DS au
 async function handler(args: unknown): Promise<McpToolResult> {
   try {
     const parsed = AuthoriseCard3dsInputSchema.parse(args);
-    const apiKey = parsed.apiKey ?? env().MONNIFY_API_KEY;
+    const apiKey = parsed.apiKey ?? tryEnv()?.MONNIFY_API_KEY;
+    if (!apiKey) {
+      return {
+        content: [{ type: "text", text: "Validation failed:\n  - apiKey: Required (or configure MONNIFY_API_KEY environment variable)" }],
+        isError: true,
+      };
+    }
     const result = await apiPost<Record<string, unknown>>(
       "/api/v1/sdk/cards/secure-3d/authorize",
       { ...parsed, apiKey }

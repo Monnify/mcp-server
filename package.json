@@ -3,6 +3,11 @@
   "version": "1.0.1",
   "description": "MCP server for Monnify payment gateway APIs",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Monnify/mcp-server.git"
+  },
+  "homepage": "https://github.com/Monnify/mcp-server#readme",
   "main": "build/index.js",
   "bin": {
     "mcp-server": "./build/cli.js"
@@ -17,11 +22,11 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "node api.js && tsc",
     "postbuild": "chmod +x build/cli.js",
-    "start": "node build/index.js",
+    "start": "node api.js && node build/index.js",
     "start:cli": "node build/cli.js",
-    "dev": "tsx watch src/index.ts",
+    "dev": "node api.js && tsx watch src/index.ts",
     "generate": "bash scripts/generate-types.sh",
     "test": "vitest run",
     "test:watch": "vitest",

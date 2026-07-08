@@ -1,7 +1,7 @@
 {
   "name": "@monnify/mcp-server",
-  "version": "1.0.0",
-  "description": "Production-grade MCP server for Monnify payment APIs — TypeScript, OpenAPI-driven",
+  "version": "1.0.1",
+  "description": "MCP server for Monnify payment gateway APIs",
   "type": "module",
   "main": "build/index.js",
   "bin": {
@@ -50,6 +50,13 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "keywords": ["monnify", "mcp", "payments", "nigeria", "fintech", "llm-agents"],
+  "keywords": [
+    "monnify",
+    "mcp",
+    "payments",
+    "nigeria",
+    "fintech",
+    "llm-agents"
+  ],
   "license": "MIT"
 }

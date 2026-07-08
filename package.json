@@ -3,6 +3,11 @@
   "version": "1.0.1",
   "description": "MCP server for Monnify payment gateway APIs",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Monnify/mcp-server.git"
+  },
+  "homepage": "https://github.com/Monnify/mcp-server#readme",
   "main": "build/index.js",
   "bin": {
     "mcp-server": "./build/cli.js"

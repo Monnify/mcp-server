@@ -185,6 +185,15 @@ describe("isOperationAllowed", () => {
     expect(isOperationAllowed("directDebit", env)).toBe(true);
     expect(isOperationAllowed("verification", env)).toBe(true);
     expect(isOperationAllowed("utilities", env)).toBe(true);
+    expect(isOperationAllowed("subAccounts", env)).toBe(true);
+  });
+
+  it("returns false for 'subAccounts' when MONNIFY_ALLOWED_OPERATIONS=verification,utilities", () => {
+    const env = makeEnv({
+      MONNIFY_ALLOWED_OPERATIONS: "verification,utilities",
+    });
+
+    expect(isOperationAllowed("subAccounts", env)).toBe(false);
   });
 
   it("returns false for 'collections' when MONNIFY_ALLOWED_OPERATIONS=verification,utilities", () => {

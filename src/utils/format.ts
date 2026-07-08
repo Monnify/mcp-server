@@ -398,3 +398,51 @@ export function formatCancelMandate(d: Record<string, unknown>): string {
     `**Status:** ${status}`,
   ].join("\n");
 }
+
+// ── Sub Accounts ──────────────────────────────────────────────────────────────
+
+export function formatSubAccountList(
+  accounts: Array<Record<string, unknown>>,
+  action: "created" | "found"
+): string {
+  if (!accounts.length) {
+    return action === "created"
+      ? "No sub accounts were created."
+      : "No sub accounts found.";
+  }
+  const rows = accounts
+    .map(
+      (a) =>
+        `| ${a["subAccountCode"] ?? "—"} | ${a["accountName"] ?? "—"} | ${a["accountNumber"] ?? "—"} (${a["bankName"] ?? a["bankCode"] ?? "—"}) | ${a["defaultSplitPercentage"] ?? "—"}% |`
+    )
+    .join("\n");
+  const title = action === "created" ? "🏢 **Sub Accounts Created**" : "🏢 **Sub Accounts**";
+  return [
+    `${title} (${accounts.length})`,
+    ``,
+    `| Sub Account Code | Name | Account | Default Split |`,
+    `|-------------------|------|---------|----------------|`,
+    rows,
+  ].join("\n");
+}
+
+export function formatUpdateSubAccount(d: Record<string, unknown>): string {
+  return [
+    `🏢 **Sub Account Updated**`,
+    ``,
+    `**Sub Account Code:** ${d["subAccountCode"] ?? "—"}`,
+    `**Account Name:** ${d["accountName"] ?? "—"}`,
+    `**Account Number:** ${d["accountNumber"] ?? "—"} (${d["bankName"] ?? d["bankCode"] ?? "—"})`,
+    `**Default Split Percentage:** ${d["defaultSplitPercentage"] ?? "—"}%`,
+  ].join("\n");
+}
+
+export function formatDeleteSubAccount(subAccountCode: string): string {
+  return [
+    `🗑️ **Sub Account Deleted**`,
+    ``,
+    `**Sub Account Code:** ${subAccountCode}`,
+    ``,
+    `> This sub-account can no longer receive split payments.`,
+  ].join("\n");
+}

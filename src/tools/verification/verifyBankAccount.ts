@@ -31,7 +31,7 @@ async function handler(args: unknown): Promise<McpToolResult> {
   try {
     const parsed = VerifyBankAccountInputSchema.parse(args);
     const result = await apiGet<Record<string, unknown>>(
-      "/api/v1/disbursements/account/validate",
+      "/api/v2/disbursements/account/validate",
       {
         accountNumber: parsed.accountNumber,
         bankCode: parsed.bankCode,

@@ -17,7 +17,7 @@ const definition: Tool = {
 
 WHEN TO USE: For KYC (Know Your Customer) verification flows, onboarding with identity checks, or before creating a direct debit mandate where BVN validation is required.
 
-PREREQUISITES: None. Requires Monnify Identity Verification API access to be enabled on your account.
+PREREQUISITES: None. Requires Monnify Identity Verification API access to be enabled on your account. Live environment only — not available in sandbox, so this call will fail with --env=sandbox regardless of BVN validity.
 
 SIDE EFFECTS: None. Read-only — does not store any data.
 

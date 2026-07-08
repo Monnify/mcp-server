@@ -1,36 +1,19 @@
 # @monnify/mcp-server
 
-[![CI](https://github.com/monnify/monnify-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/monnify/monnify-mcp-server/actions/workflows/ci.yml)
+[![CI](https://github.com/monnify/mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/monnify/mcp-server/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@monnify/mcp-server.svg)](https://www.npmjs.com/package/@monnify/mcp-server)
 
-Give your AI assistant the ability to accept payments, verify identities, manage virtual accounts, and query transactions — all through [Monnify](https://monnify.com).
+Give your AI assistant the ability to accept payments, verify identities, manage virtual accounts, and query transactions, all through [Monnify](https://monnify.com).
 
-This is an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server. Once connected, your AI client can talk directly to the Monnify API using plain language — no custom integration code required.
+This is an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server. Once connected, your AI client can talk directly to the Monnify API using plain language. No custom integration code required.
 
 ---
 
 ## What you can do once it's connected
 
-**Payment collection**
-> *"Initiate a payment of ₦15,000 for invoice #INV-2024-007 and send me the checkout link"*
-> *"Create a dedicated virtual account for customer cust_089 so they can pay anytime by bank transfer"*
-> *"Get me the status of transaction TRX-20240601-001"*
-> *"Show me all failed transactions from last week"*
+A few examples of what you'd actually ask while wiring this into a real feature:
 
-**Identity verification**
-> *"Verify that account 0123456789 belongs to John Doe at GTBank"*
-> *"Check BVN 22345678901 — does the name and date of birth match?"*
-> *"Verify NIN 12345678901 for a customer named Amaka Obi"*
-
-**Account management**
-> *"What transactions came into reserved account ACCT-REF-001 this month?"*
-> *"Deallocate the virtual account for the customer who churned last quarter"*
-> *"Create a payment invoice for ₦50,000 that expires in 48 hours"*
-
-**Engineering / integrations**
-> *"List all banks and their codes so I can populate a dropdown"*
-> *"Get the full details of transaction REF-XYZ for a support ticket"*
-> *"Process a partial refund of ₦2,500 on transaction TRX-20240601-009"*
+> _"add a reserved account to our wallet feature so customers can top up by bank transfer"_ > _"set up a one-time checkout for a ₦15,000 order and give me the payment link"_ > _"create a ₦50,000 invoice that expires in 48 hours"_ > _"validate this account number before we save it to the customer's payout details"_ > _"refund ₦2,500 on transaction TRX-20240601-009"_
 
 ---
 
@@ -91,7 +74,7 @@ Restart Claude Desktop after saving. You will see "monnify" appear in the tools 
 
 ### Claude Code (CLI)
 
-**Project-level** — add to `.claude/mcp.json` in your repo (checked in, shared with your team):
+**Project-level:** add to `.claude/mcp.json` in your repo (checked in, shared with your team):
 
 ```json
 {
@@ -112,7 +95,7 @@ Restart Claude Desktop after saving. You will see "monnify" appear in the tools 
 }
 ```
 
-**Global** — add to `~/.claude/claude_desktop_config.json` so it's available in every Claude Code session:
+**Global:** add to `~/.claude/claude_desktop_config.json` so it's available in every Claude Code session:
 
 ```bash
 claude mcp add monnify \
@@ -124,6 +107,7 @@ claude mcp add monnify \
 ```
 
 Verify it loaded:
+
 ```bash
 claude mcp list
 ```
@@ -179,7 +163,7 @@ Add to `~/.gemini/settings.json`:
 }
 ```
 
-Run `gemini` in your terminal — type `@monnify` to confirm the server is available.
+Run `gemini` in your terminal, then type `@monnify` to confirm the server is available.
 
 ---
 
@@ -232,7 +216,7 @@ Create `.vscode/mcp.json` in your workspace root:
 }
 ```
 
-Open the Copilot Chat panel, switch to **Agent mode**, and the Monnify tools will be available. Commit `.vscode/mcp.json` to share the setup with your team (credentials should come from environment variables — see [using environment variables](#using-environment-variables)).
+Open the Copilot Chat panel, switch to **Agent mode**, and the Monnify tools will be available. Commit `.vscode/mcp.json` to share the setup with your team (credentials should come from environment variables; see [using environment variables](#using-environment-variables)).
 
 ---
 
@@ -334,16 +318,16 @@ Avoid hardcoding credentials in config files by passing them via environment var
 
 All CLI flags have an equivalent environment variable:
 
-| CLI flag          | Environment variable        |
-|-------------------|-----------------------------|
-| `--apiKey`        | `MONNIFY_API_KEY`           |
-| `--secretKey`     | `MONNIFY_SECRET_KEY`        |
-| `--contractCode`  | `MONNIFY_CONTRACT_CODE`     |
-| `--env`           | `MONNIFY_ENV`               |
-| `--transport`     | `MONNIFY_TRANSPORT`         |
-| `--port`          | `MONNIFY_PORT`              |
-| `--tools`         | `MONNIFY_TOOLS`             |
-| `--format`        | `MONNIFY_RESPONSE_FORMAT`   |
+| CLI flag         | Environment variable      |
+| ---------------- | ------------------------- |
+| `--apiKey`       | `MONNIFY_API_KEY`         |
+| `--secretKey`    | `MONNIFY_SECRET_KEY`      |
+| `--contractCode` | `MONNIFY_CONTRACT_CODE`   |
+| `--env`          | `MONNIFY_ENV`             |
+| `--transport`    | `MONNIFY_TRANSPORT`       |
+| `--port`         | `MONNIFY_PORT`            |
+| `--tools`        | `MONNIFY_TOOLS`           |
+| `--format`       | `MONNIFY_RESPONSE_FORMAT` |
 
 ---
 
@@ -351,11 +335,11 @@ All CLI flags have an equivalent environment variable:
 
 The server automatically detects which client is connecting and adapts its responses:
 
-| Client | Response format |
-|--------|----------------|
-| Claude Desktop, Claude Code CLI | Conversational Markdown with status icons, Naira formatting, and human-readable dates |
-| Cursor, VS Code Copilot, Windsurf, Zed, Continue.dev | Clean JSON — machine-readable and easy to pipe into other tools |
-| ChatGPT, Gemini | Conversational Markdown |
+| Client                                               | Response format                                                                       |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Claude Desktop, Claude Code CLI                      | Conversational Markdown with status icons, Naira formatting, and human-readable dates |
+| Cursor, VS Code Copilot, Windsurf, Zed, Continue.dev | Clean JSON, machine-readable and easy to pipe into other tools                        |
+| ChatGPT, Gemini                                      | Conversational Markdown                                                               |
 
 **Override the format** with the `--format` flag if the auto-detection doesn't match your workflow:
 
@@ -394,66 +378,95 @@ Expires:     1 Jul 2024, 11:59 PM WAT
 
 ## All options
 
-| Flag             | Default   | Description                                         |
-|------------------|-----------|-----------------------------------------------------|
-| `--apiKey`       | —         | Your Monnify API key (required)                     |
-| `--secretKey`    | —         | Your Monnify secret key (required)                  |
-| `--contractCode` | —         | Your Monnify contract code (required)               |
-| `--env`          | `sandbox` | `sandbox` or `production`                           |
-| `--transport`    | `stdio`   | `stdio` (local clients) or `http` (team deployments)|
-| `--port`         | `3000`    | Port to listen on when using `--transport=http`     |
-| `--tools`        | all       | Comma-separated list of tool categories (see below) |
-| `--format`       | `auto`    | `auto`, `markdown`, or `json`                       |
-| `--httpToken`    | —         | Bearer token to authenticate HTTP `/mcp` requests   |
+| Flag             | Default   | Description                                          |
+| ---------------- | --------- | ---------------------------------------------------- |
+| `--apiKey`       | none      | Your Monnify API key (required)                      |
+| `--secretKey`    | none      | Your Monnify secret key (required)                   |
+| `--contractCode` | none      | Your Monnify contract code (required)                |
+| `--env`          | `sandbox` | `sandbox` or `production`                            |
+| `--transport`    | `stdio`   | `stdio` (local clients) or `http` (team deployments) |
+| `--port`         | `3000`    | Port to listen on when using `--transport=http`      |
+| `--tools`        | all       | Comma-separated list of tool categories (see below)  |
+| `--format`       | `auto`    | `auto`, `markdown`, or `json`                        |
+| `--httpToken`    | none      | Bearer token to authenticate HTTP `/mcp` requests    |
 
 ---
 
-## Available tools (25)
+## Available tools (29)
 
 ### Collections (15)
 
-| Tool | What it does |
-|------|--------------|
-| `monnify_initiate_payment` | Creates a payment and returns a checkout URL |
-| `monnify_reserve_account` | Reserves a virtual bank account for a customer |
-| `monnify_get_reserved_account` | Fetches details and status of a reserved account |
+| Tool                                        | What it does                                      |
+| ------------------------------------------- | ------------------------------------------------- |
+| `monnify_initiate_payment`                  | Creates a payment and returns a checkout URL      |
+| `monnify_reserve_account`                   | Reserves a virtual bank account for a customer    |
+| `monnify_get_reserved_account`              | Fetches details and status of a reserved account  |
 | `monnify_get_reserved_account_transactions` | Lists transactions received on a reserved account |
-| `monnify_deallocate_reserved_account` | Permanently removes a reserved account |
-| `monnify_get_transaction_status` | Checks the status of a transaction by reference |
-| `monnify_get_transaction_details` | Fetches full details of a transaction |
-| `monnify_get_all_transactions` | Lists transactions with filters and pagination |
-| `monnify_create_invoice` | Creates a payment invoice with an expiry date |
-| `monnify_process_refund` | Issues a full or partial refund |
-| `monnify_pay_with_bank_transfer` | Starts a pay-by-bank-transfer flow |
-| `monnify_charge_card` | Charges a card with PAN and CVV |
-| `monnify_charge_card_token` | Charges a previously saved card token |
-| `monnify_authorise_card_otp` | Submits OTP to complete a card charge |
-| `monnify_authorise_card_3ds` | Completes 3DS verification for a card charge |
+| `monnify_deallocate_reserved_account`       | Permanently removes a reserved account            |
+| `monnify_get_transaction_status`            | Checks the status of a transaction by reference   |
+| `monnify_get_transaction_details`           | Fetches full details of a transaction             |
+| `monnify_get_all_transactions`              | Lists transactions with filters and pagination    |
+| `monnify_create_invoice`                    | Creates a payment invoice with an expiry date     |
+| `monnify_process_refund`                    | Issues a full or partial refund                   |
+| `monnify_pay_with_bank_transfer`            | Starts a pay-by-bank-transfer flow                |
+| `monnify_charge_card`                       | Charges a card with PAN and CVV                   |
+| `monnify_charge_card_token`                 | Charges a previously saved card token             |
+| `monnify_authorise_card_otp`                | Submits OTP to complete a card charge             |
+| `monnify_authorise_card_3ds`                | Completes 3DS verification for a card charge      |
 
 ### Direct Debit (5)
 
-| Tool | What it does |
-|------|--------------|
-| `monnify_create_mandate` | Creates a direct debit mandate |
-| `monnify_get_mandate_status` | Checks if a mandate is active and ready to debit |
-| `monnify_debit_mandate` | Debits an active mandate |
-| `monnify_get_mandate_debit_status` | Checks the status of a debit attempt |
-| `monnify_cancel_mandate` | Cancels a mandate permanently |
+| Tool                               | What it does                                     |
+| ---------------------------------- | ------------------------------------------------ |
+| `monnify_create_mandate`           | Creates a direct debit mandate                   |
+| `monnify_get_mandate_status`       | Checks if a mandate is active and ready to debit |
+| `monnify_debit_mandate`            | Debits an active mandate                         |
+| `monnify_get_mandate_debit_status` | Checks the status of a debit attempt             |
+| `monnify_cancel_mandate`           | Cancels a mandate permanently                    |
 
 ### Verification (4)
 
-| Tool | What it does |
-|------|--------------|
-| `monnify_verify_bank_account` | Verifies an account number and returns the account name |
-| `monnify_verify_bvn` | Matches a BVN against name, date of birth, and phone number |
-| `monnify_verify_bvn_info` | Checks whether all submitted BVN details match holistically |
-| `monnify_verify_nin` | Verifies a NIN and returns the associated record |
+| Tool                          | What it does                                                |
+| ----------------------------- | ----------------------------------------------------------- |
+| `monnify_verify_bank_account` | Verifies an account number and returns the account name     |
+| `monnify_verify_bvn`          | Matches a BVN against name, date of birth, and phone number |
+| `monnify_verify_bvn_info`     | Checks whether all submitted BVN details match holistically |
+| `monnify_verify_nin`          | Verifies a NIN and returns the associated record            |
 
 ### Utilities (1)
 
-| Tool | What it does |
-|------|--------------|
+| Tool                          | What it does                              |
+| ----------------------------- | ----------------------------------------- |
 | `monnify_get_supported_banks` | Lists all supported banks and their codes |
+
+### Sub Accounts (4)
+
+| Tool                          | What it does                                                  |
+| ----------------------------- | ------------------------------------------------------------- |
+| `monnify_create_sub_accounts` | Creates one or more sub-accounts for payment splitting        |
+| `monnify_get_sub_accounts`    | Lists all sub-accounts on your integration                    |
+| `monnify_update_sub_account`  | Updates a sub-account's bank details, email, or default split |
+| `monnify_delete_sub_account`  | Permanently deletes a sub-account                             |
+
+A sub-account must exist (created via `monnify_create_sub_accounts`, or the Monnify dashboard) before its `subAccountCode` can be used in `incomeSplitConfig` on `monnify_initiate_payment`, `monnify_reserve_account`, `monnify_charge_card_token`, or `monnify_debit_mandate`.
+
+---
+
+## Sandbox limitations
+
+A few Monnify features are restricted or disabled by default. Knowing these upfront saves time debugging what looks like an integration bug:
+
+| Feature                                                                                                                                                                       | Behaviour                                                                                                                                                                                                                                                                                                        |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `monnify_verify_bvn`, `monnify_verify_bvn_info`, `monnify_verify_nin`                                                                                                         | **Live only.** These identity checks always fail in sandbox, regardless of the BVN/NIN supplied. Test against production (with a real BVN/NIN) or mock the flow in your own tests.                                                                                                                               |
+| `monnify_process_refund`                                                                                                                                                      | **Disabled by default**, and only works for transactions originally paid via **ACCOUNT_TRANSFER**. Check `paymentMethod` with `monnify_get_transaction_status` first. Transactions paid by CARD or USSD cannot be refunded through this API at all. Email **integration-support@monnify.com** to request access. |
+| Direct Debit (`monnify_create_mandate` and the rest of the mandate lifecycle)                                                                                                 | **Disabled by default.** Returns "not permitted" until enabled on your account. Email **integration-support@monnify.com** to request access.                                                                                                                                                                     |
+| Sub Accounts (`monnify_create_sub_accounts` and the rest of the Sub Account tools, plus `incomeSplitConfig`/`subAccountCode` on payment, reserved-account, and mandate tools) | **Disabled by default.** Returns "not permitted" until enabled on your account. Email **integration-support@monnify.com** to request access. A sub-account must also exist before its code can be used in any `incomeSplitConfig`.                                                                               |
+| Wallet balance / disbursement wallet endpoints                                                                                                                                | Not exposed as a tool in this server; when available on your account, they're also permission-gated the same way.                                                                                                                                                                                                |
+
+If you hit a "not permitted" response on a feature not listed here, it likely needs enabling the same way. Contact **integration-support@monnify.com** rather than assuming the request is malformed.
+
+**Date format quirk:** `monnify_create_invoice`'s `expiryDate` must be `YYYY-MM-DD HH:mm:ss` (space-separated), not ISO 8601 (`YYYY-MM-DDTHH:mm:ss`). The tool validates this and will reject an ISO 8601 value with a clear error before it reaches the API.
 
 ---
 
@@ -472,22 +485,22 @@ npx -y @monnify/mcp-server --apiKey=... --secretKey=... --contractCode=... --too
 npx -y @monnify/mcp-server --apiKey=... --secretKey=... --contractCode=... --tools=collections,verification
 ```
 
-Available categories: `collections`, `directDebit`, `verification`, `utilities`
+Available categories: `collections`, `directDebit`, `verification`, `utilities`, `subAccounts`
 
 ---
 
 ## Running as an HTTP server (team deployments)
 
-Deploy a single shared instance and connect multiple clients to it — useful for team environments, CI pipelines, or production AI integrations.
+Deploy a single shared instance and connect multiple clients to it. Useful for team environments, CI pipelines, or production AI integrations.
 
-**Step 1 — Generate a bearer token:**
+**Step 1: Generate a bearer token**
 
 ```bash
 openssl rand -hex 32
 # e.g. a3f8c2d1e4b5a6...
 ```
 
-**Step 2 — Start the server:**
+**Step 2: Start the server**
 
 ```bash
 npx -y @monnify/mcp-server \
@@ -500,9 +513,9 @@ npx -y @monnify/mcp-server \
   --httpToken=YOUR_GENERATED_TOKEN
 ```
 
-The server will reject any `/mcp` request that does not carry `Authorization: Bearer YOUR_GENERATED_TOKEN`. If you start without `--httpToken`, it starts unauthenticated and logs a warning — acceptable for local development, not for any internet-facing deployment.
+The server will reject any `/mcp` request that does not carry `Authorization: Bearer YOUR_GENERATED_TOKEN`. If you start without `--httpToken`, it starts unauthenticated and logs a warning. That's fine for local development, not for any internet-facing deployment.
 
-**Step 3 — Connect your AI client:**
+**Step 3: Connect your AI client**
 
 ```bash
 # Claude Code
@@ -511,7 +524,7 @@ claude mcp add monnify --transport http http://localhost:3000/mcp
 
 For clients that accept a custom header, set `Authorization: Bearer YOUR_GENERATED_TOKEN` alongside the endpoint URL.
 
-**Step 4 — Put HTTPS in front of it.** Terminate TLS at a reverse proxy (nginx, Caddy, Cloudflare Tunnel) before exposing the server outside your local network. Never send credentials over plain HTTP.
+**Step 4: Put HTTPS in front of it.** Terminate TLS at a reverse proxy (nginx, Caddy, Cloudflare Tunnel) before exposing the server outside your local network. Never send credentials over plain HTTP.
 
 Health check (no auth required): `GET /health`
 
@@ -552,7 +565,7 @@ Open `http://localhost:5173` in your browser to browse and invoke tools.
 ## Security
 
 - Credentials are passed as CLI args or environment variables and never stored
-- All API responses are filtered through a whitelist — internal Monnify fields are stripped before returning data to the AI client
+- All API responses are filtered through a whitelist, so internal Monnify fields are stripped before returning data to the AI client
 - Destructive tools (deallocate, cancel mandate) are clearly labelled in their descriptions so the AI client warns before executing them
 - Scope tool access with `--tools` to only expose what a given agent needs
 
@@ -560,4 +573,4 @@ Open `http://localhost:5173` in your browser to browse and invoke tools.
 
 ## License
 
-MIT — built by the [Monnify](https://monnify.com) team.
+MIT. Built by the [Monnify](https://monnify.com) team.

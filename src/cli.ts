@@ -26,7 +26,7 @@ program
   )
   .option(
     "--tools <categories>",
-    "Comma-separated list of tool categories to enable: collections,directDebit,verification,utilities"
+    "Comma-separated list of tool categories to enable: collections,directDebit,verification,utilities,subAccounts"
   )
   .option(
     "--format <format>",

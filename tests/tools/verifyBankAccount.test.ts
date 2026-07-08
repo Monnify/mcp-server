@@ -42,6 +42,10 @@ describe("monnify_verify_bank_account", () => {
     });
 
     expect(result.isError).toBeFalsy();
+    expect(apiGet).toHaveBeenCalledWith(
+      "/api/v2/disbursements/account/validate",
+      { accountNumber: "0123456789", bankCode: "058" }
+    );
     const text = result.content[0]?.text ?? "";
     const parsed = JSON.parse(text);
     expect(parsed.accountName).toBe("JOHN DOE");

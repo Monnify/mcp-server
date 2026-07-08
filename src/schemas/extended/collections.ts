@@ -60,7 +60,9 @@ export const InitiatePaymentInputSchema = InitiatePaymentBodySchema.extend({
         subAccountCode: z
           .string()
           .optional()
-          .describe("Monnify sub-account code to receive the split (e.g. 'MFY_SUB_319452883228')."),
+          .describe(
+            "Monnify sub-account code to receive the split (e.g. 'MFY_SUB_319452883228'). Sub Accounts are disabled by default — email integration-support@monnify.com to enable this feature."
+          ),
         feePercentage: z
           .number()
           .optional()
@@ -164,7 +166,9 @@ export const ReserveAccountInputSchema = ReserveAccountBodySchema.extend({
         subAccountCode: z
           .string()
           .optional()
-          .describe("Monnify sub-account code to receive the split (e.g. 'MFY_SUB_319452883228')."),
+          .describe(
+            "Monnify sub-account code to receive the split (e.g. 'MFY_SUB_319452883228'). Sub Accounts are disabled by default — email integration-support@monnify.com to enable this feature."
+          ),
         feePercentage: z
           .number()
           .optional()
@@ -222,8 +226,12 @@ export const CreateInvoiceInputSchema = CreateInvoiceBodySchema.extend({
     .describe("Currency code — currently only NGN is supported."),
   expiryDate: z
     .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/,
+      "expiryDate must be in 'YYYY-MM-DD HH:mm:ss' format (space-separated, not ISO 8601 — e.g. '2024-12-19 10:15:30')"
+    )
     .describe(
-      "Invoice expiry date in ISO 8601 format (YYYY-MM-DDTHH:mm:ss). After this date the invoice can no longer be paid."
+      "Invoice expiry date in 'YYYY-MM-DD HH:mm:ss' format (space-separated — NOT ISO 8601, e.g. '2024-12-19 10:15:30'). After this date the invoice can no longer be paid."
     ),
   paymentMethods: z
     .array(z.enum(["CARD", "ACCOUNT_TRANSFER", "USSD", "PHONE_NUMBER"]))
@@ -441,7 +449,12 @@ export const ChargeCardTokenInputSchema = z.object({
   incomeSplitConfig: z
     .array(
       z.object({
-        subAccountCode: z.string().optional().describe("Sub-account code to receive the split."),
+        subAccountCode: z
+          .string()
+          .optional()
+          .describe(
+            "Sub-account code to receive the split. Sub Accounts are disabled by default — email integration-support@monnify.com to enable this feature."
+          ),
         feePercentage: z.number().optional().describe("Percentage of the fee borne by this sub-account."),
         splitPercentage: z.number().optional().describe("Percentage of the amount credited to this sub-account."),
         splitAmount: z.number().optional().describe("Fixed amount credited to this sub-account per transaction."),

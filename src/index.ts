@@ -56,6 +56,12 @@ if (isOperationAllowed("directDebit", env())) {
   await import("./tools/directDebit/getMandateDebitStatus.js");
   await import("./tools/directDebit/cancelMandate.js");
 }
+if (isOperationAllowed("subAccounts", env())) {
+  await import("./tools/subAccounts/createSubAccounts.js");
+  await import("./tools/subAccounts/getSubAccounts.js");
+  await import("./tools/subAccounts/updateSubAccount.js");
+  await import("./tools/subAccounts/deleteSubAccount.js");
+}
 
 export const server = new Server(
   { name: "monnify-mcp", version: "1.0.0" },

@@ -31,7 +31,7 @@ describe("monnify_create_invoice", () => {
     customerEmail: "customer@example.com",
     customerName: "John Doe",
     currencyCode: "NGN",
-    expiryDate: "2025-12-31T23:59:59",
+    expiryDate: "2025-12-31 23:59:59",
   };
 
   it("returns checkoutUrl and invoiceReference on success", async () => {
@@ -62,7 +62,7 @@ describe("monnify_create_invoice", () => {
         invoiceReference: "INV-001",
         contractCode: "626843051499",
         customerEmail: "customer@example.com",
-        expiryDate: "2025-12-31T23:59:59",
+        expiryDate: "2025-12-31 23:59:59",
       })
     );
     const parsed = JSON.parse(result.content[0]?.text ?? "");
@@ -108,6 +108,20 @@ describe("monnify_create_invoice", () => {
 
     const { expiryDate: _, ...noExpiry } = validInput;
     const result = await handler(noExpiry);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain("Validation failed");
+    expect(apiPost).not.toHaveBeenCalled();
+  });
+
+  it("fails validation when expiryDate is ISO 8601 instead of space-separated", async () => {
+    const { apiPost } = await import("../../src/client/monnifyClient.js");
+    const { handler } = await import("../../src/tools/collections/createInvoice.js");
+
+    const result = await handler({
+      ...validInput,
+      expiryDate: "2025-12-31T23:59:59",
+    });
 
     expect(result.isError).toBe(true);
     expect(result.content[0]?.text).toContain("Validation failed");

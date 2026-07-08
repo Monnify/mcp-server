@@ -17,9 +17,9 @@ const definition: Tool = {
 
 WHEN TO USE: To reverse a charge at a customer's request, after an order cancellation, or when a duplicate or suspicious charge is detected. Can be a full or partial refund.
 
-PREREQUISITES: The original transaction must have paymentStatus = PAID. Obtain the transactionReference from monnify_get_transaction_status. Verify the destination account with monnify_verify_bank_account first.
+PREREQUISITES: The original transaction must have paymentStatus = PAID AND paymentMethod = ACCOUNT_TRANSFER — check both via monnify_get_transaction_status or monnify_get_transaction_details first. Transactions paid by CARD or USSD cannot be refunded through this API at all; the request will be rejected regardless of amount. Verify the destination account with monnify_verify_bank_account first. The Refund API is also disabled by default — a "not permitted" response means it needs to be enabled on your account by emailing integration-support@monnify.com, not that the request was malformed.
 
-SIDE EFFECTS: Initiates a real fund transfer back to the customer. This is a financial operation — confirm the transaction reference and refund amount carefully before proceeding. Using the same refundReference is safe (idempotent — will not double-refund).
+SIDE EFFECTS: Initiates a real fund transfer back to the customer's bank account. This is a financial operation — confirm the transaction reference and refund amount carefully before proceeding. Using the same refundReference is safe (idempotent — will not double-refund).
 
 MFA NOTE: Not applicable.
 

@@ -156,6 +156,11 @@ export async function apiPatch<T>(path: string, body?: unknown): Promise<T> {
   return (data as unknown as { responseBody: T }).responseBody;
 }
 
+export async function apiPut<T>(path: string, body: unknown): Promise<T> {
+  const { data } = await monnifyClient.put<{ responseBody: T }>(path, body);
+  return (data as unknown as { responseBody: T }).responseBody;
+}
+
 export async function apiDelete<T>(path: string): Promise<T> {
   const { data } = await monnifyClient.delete<{ responseBody: T }>(path);
   return (data as unknown as { responseBody: T }).responseBody;

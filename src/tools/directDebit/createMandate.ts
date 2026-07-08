@@ -17,7 +17,7 @@ const definition: Tool = {
 
 WHEN TO USE: When setting up recurring billing for a customer — subscriptions, instalments, or utility collection. This is always the first step in the Direct Debit lifecycle.
 
-PREREQUISITES: None. However, verify the customer's bank account with monnify_verify_bank_account first to confirm account details before committing them to a mandate.
+PREREQUISITES: Direct Debit is disabled by default — email integration-support@monnify.com to have it enabled on your account before use. Also verify the customer's bank account with monnify_verify_bank_account first to confirm account details before committing them to a mandate.
 
 SIDE EFFECTS: Generates a mandateReference and a 30-day authorization link. The mandate status starts as PENDING_AUTHORIZATION — no debiting can occur until the customer clicks the link and authorises via their bank. Monnify automatically routes to TeamApt or NIBSS based on the customer's bank.
 

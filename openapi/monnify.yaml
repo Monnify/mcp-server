@@ -2662,7 +2662,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-  /api/v1/disbursements/account/validate:
+  /api/v2/disbursements/account/validate:
     get:
       tags:
         - Verification APIs

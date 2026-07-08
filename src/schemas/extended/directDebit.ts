@@ -120,7 +120,12 @@ export const DebitMandateInputSchema = DebitMandateBodySchema.extend({
   incomeSplitConfig: z
     .array(
       z.object({
-        subAccountCode: z.string().optional().describe("Sub-account code to receive the split."),
+        subAccountCode: z
+          .string()
+          .optional()
+          .describe(
+            "Sub-account code to receive the split. Sub Accounts are disabled by default — email integration-support@monnify.com to enable this feature."
+          ),
         feePercentage: z.number().optional().describe("Percentage of the fee borne by this sub-account."),
         splitAmount: z.number().optional().describe("Fixed amount credited to this sub-account per debit."),
         splitPercentage: z.number().optional().describe("Percentage of the debit amount credited to this sub-account."),

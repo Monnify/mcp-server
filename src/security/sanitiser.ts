@@ -213,6 +213,19 @@ const DEALLOCATE_ACCOUNT_FIELDS = [
   "status",
 ] as const;
 
+// Sub Accounts — whitelisted fields
+const SUB_ACCOUNT_FIELDS = [
+  "subAccountCode",
+  "accountNumber",
+  "accountName",
+  "currencyCode",
+  "email",
+  "bankCode",
+  "bankName",
+  "defaultSplitPercentage",
+  "settlementProfileCode",
+] as const;
+
 // Bank list — whitelisted fields
 const BANK_FIELDS = ["name", "code"] as const;
 
@@ -335,6 +348,18 @@ export function sanitiseNinResponse(
   raw: Record<string, unknown>
 ): Record<(typeof NIN_FIELDS)[number], unknown> {
   return pickFields(raw, NIN_FIELDS);
+}
+
+export function sanitiseSubAccountResponse(
+  raw: Record<string, unknown>
+): Record<(typeof SUB_ACCOUNT_FIELDS)[number], unknown> {
+  return pickFields(raw, SUB_ACCOUNT_FIELDS);
+}
+
+export function sanitiseSubAccountListResponse(
+  raw: Array<Record<string, unknown>>
+): Array<Record<(typeof SUB_ACCOUNT_FIELDS)[number], unknown>> {
+  return raw.map((account) => pickFields(account, SUB_ACCOUNT_FIELDS));
 }
 
 export function sanitiseBankListResponse(

@@ -4,7 +4,8 @@ export type OperationCategory =
   | "collections"
   | "directDebit"
   | "verification"
-  | "utilities";
+  | "utilities"
+  | "subAccounts";
 
 const API_KEY_PATTERN = /^MK_(TEST|PROD)_[A-Za-z0-9]{10}/;
 

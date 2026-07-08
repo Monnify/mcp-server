@@ -15,6 +15,8 @@ export const AuthoriseCard3dsBodySchema = s["Authorize3DSCardRequest"]!;
 export const CreateMandateBodySchema = s["CreateMandateRequest"]!;
 export const DebitMandateBodySchema = s["DebitMandateRequest"]!;
 export const VerifyBvnBodySchema = s["BVNVerificationRequest"]!;
+export const CreateSubAccountBodySchema = s["CreateSubAccountRequest"]!;
+export const UpdateSubAccountBodySchema = s["UpdateSubAccountRequest"]!;
 
 export const CancelMandateBodySchema = z
   .object({
